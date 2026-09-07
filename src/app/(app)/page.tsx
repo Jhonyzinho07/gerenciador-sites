@@ -2,6 +2,8 @@ import { prisma } from '@/lib/prisma'
 import { KanbanBoard, type BoardSite } from '@/components/KanbanBoard'
 import { NewSiteButton } from '@/components/NewSiteButton'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardPage() {
   const sites = await prisma.site.findMany({
     include: { checklist: { select: { done: true } } },
