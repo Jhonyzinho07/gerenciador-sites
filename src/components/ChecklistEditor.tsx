@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import type { KeyboardEvent } from 'react'
 import { DndContext, DragEndEvent, closestCenter } from '@dnd-kit/core'
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
@@ -11,14 +12,41 @@ function Row({
   item,
   onToggle,
   onDelete,
+  onRename,
 }: {
   item: ChecklistItemData
   onToggle: (id: string, done: boolean) => void
   onDelete: (id: string) => void
+  onRename: (id: string, label: string) => void
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
   })
+  const [editing, setEditing] = useState(false)
+  const [value, setValue] = useState(item.label)
+
+  function startEditing() {
+    setValue(item.label)
+    setEditing(true)
+  }
+
+  function commit() {
+    setEditing(false)
+    const trimmed = value.trim()
+    if (trimmed && trimmed !== item.label) {
+      onRename(item.id, trimmed)
+    }
+  }
+
+  function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      commit()
+    } else if (e.key === 'Escape') {
+      setValue(item.label)
+      setEditing(false)
+    }
+  }
 
   return (
     <div
@@ -38,9 +66,31 @@ function Row({
         ⠿
       </span>
       <input type="checkbox" checked={item.done} onChange={(e) => onToggle(item.id, e.target.checked)} />
-      <span style={{ flex: 1, textDecoration: item.done ? 'line-through' : 'none', color: item.done ? 'var(--text-2)' : 'var(--text)' }}>
-        {item.label}
-      </span>
+      {editing ? (
+        <input
+          autoFocus
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={commit}
+          onKeyDown={handleKeyDown}
+          style={{ flex: 1, padding: 4, borderRadius: 'var(--radius-sm)', border: '1px solid var(--line)' }}
+        />
+      ) : (
+        <span
+          onDoubleClick={startEditing}
+          style={{
+            flex: 1,
+            cursor: 'text',
+            textDecoration: item.done ? 'line-through' : 'none',
+            color: item.done ? 'var(--text-2)' : 'var(--text)',
+          }}
+        >
+          {item.label}
+        </span>
+      )}
+      <button onClick={startEditing} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-2)' }}>
+        editar
+      </button>
       <button onClick={() => onDelete(item.id)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-2)' }}>
         remover
       </button>
@@ -64,6 +114,23 @@ export function ChecklistEditor({ siteId, initialItems }: { siteId: string; init
   async function handleDelete(id: string) {
     setItems((prev) => prev.filter((i) => i.id !== id))
     await fetch(`/api/sites/${siteId}/checklist/${id}`, { method: 'DELETE' })
+  }
+
+  async function handleRename(id: string, label: string) {
+    const previous = items
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, label } : i)))
+    try {
+      const res = await fetch(`/api/sites/${siteId}/checklist/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ label }),
+      })
+      if (!res.ok) {
+        setItems(previous)
+      }
+    } catch {
+      setItems(previous)
+    }
   }
 
   async function handleAdd() {
@@ -104,7 +171,7 @@ export function ChecklistEditor({ siteId, initialItems }: { siteId: string; init
       <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
           {items.map((item) => (
-            <Row key={item.id} item={item} onToggle={handleToggle} onDelete={handleDelete} />
+            <Row key={item.id} item={item} onToggle={handleToggle} onDelete={handleDelete} onRename={handleRename} />
           ))}
         </SortableContext>
       </DndContext>

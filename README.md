@@ -11,6 +11,9 @@ um template editável.
    ex: Neon/Vercel Postgres), `AUTH_SECRET` (string aleatória longa),
    `SEED_EMAIL` e `SEED_PASSWORD` (credenciais do único usuário admin).
 3. `npx prisma migrate dev --name init`
+   Isso gera a pasta `prisma/migrations/` — **commite essa pasta no git**,
+   ela é necessária para o deploy funcionar (`prisma migrate deploy` na
+   Vercel só aplica migrações já commitadas).
 4. `npx prisma db seed`
 5. `npm run dev`
 

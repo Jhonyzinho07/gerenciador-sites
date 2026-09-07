@@ -29,4 +29,18 @@ describe('reorderColumn', () => {
     const result = reorderColumn(items, 'b', 'A', 0)
     expect(result.map((i) => i.id).sort()).toEqual(['a', 'b'])
   })
+
+  it('clamps a destIndex past the end of the column to the last position', () => {
+    const items = [make('a', 'A', 0), make('b', 'A', 1)]
+    const result = reorderColumn(items, 'a', 'A', 99)
+    const byId = Object.fromEntries(result.map((i) => [i.id, i]))
+    expect(byId.a).toMatchObject({ status: 'A', priority: 1 })
+    expect(byId.b).toMatchObject({ status: 'A', priority: 0 })
+  })
+
+  it('returns no changes when movedId does not match any item', () => {
+    const items = [make('a', 'A', 0), make('b', 'A', 1)]
+    const result = reorderColumn(items, 'missing', 'A', 0)
+    expect(result).toEqual([])
+  })
 })

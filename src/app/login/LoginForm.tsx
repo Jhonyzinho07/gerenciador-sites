@@ -14,18 +14,23 @@ export function LoginForm() {
     event.preventDefault()
     setError(null)
     setLoading(true)
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    })
-    setLoading(false)
-    if (!res.ok) {
-      setError('Email ou senha inválidos.')
-      return
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      if (!res.ok) {
+        setError('Email ou senha inválidos.')
+        return
+      }
+      router.push('/')
+      router.refresh()
+    } catch {
+      setError('Erro de conexão. Tente novamente.')
+    } finally {
+      setLoading(false)
     }
-    router.push('/')
-    router.refresh()
   }
 
   return (
