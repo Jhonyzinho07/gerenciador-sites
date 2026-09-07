@@ -1,0 +1,40 @@
+/* src/app/globals.css */
+:root {
+  --blue-800: #1E3F82;
+  --blue-700: #2D559B;
+  --blue-600: #3A6EAC;
+  --teal-700: #1F6E63;
+  --teal-600: #2F9385;
+  --teal-500: #45A99A;
+  --mint: #79C0C5;
+
+  --paper: #FAFAF9;
+  --paper-2: #F1F3F7;
+  --line: #E4E7EC;
+
+  --ink: #0B0D14;
+  --ink-2: #141824;
+  --text: #0B0D14;
+  --text-2: #5A6472;
+
+  --gradient-brand: linear-gradient(135deg, #2D559B 0%, #3A6EAC 45%, #2F9385 100%);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper-2);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+a {
+  color: inherit;
+}
