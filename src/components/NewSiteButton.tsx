@@ -1,12 +1,13 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 
 export function NewSiteButton() {
   const router = useRouter()
   const [name, setName] = useState('')
   const [open, setOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   async function handleCreate() {
     const trimmed = name.trim()
@@ -19,7 +20,9 @@ export function NewSiteButton() {
     if (res.ok) {
       setName('')
       setOpen(false)
-      router.refresh()
+      startTransition(() => {
+        router.refresh()
+      })
     }
   }
 
@@ -50,11 +53,12 @@ export function NewSiteButton() {
         onChange={(e) => setName(e.target.value)}
         placeholder="Nome do site"
         style={{ padding: 8, borderRadius: 'var(--radius-sm)', border: '1px solid var(--line)' }}
+        disabled={isPending}
       />
-      <button onClick={handleCreate} style={{ padding: '8px 12px' }}>
-        Criar
+      <button onClick={handleCreate} disabled={isPending} style={{ padding: '8px 12px' }}>
+        {isPending ? 'Criando...' : 'Criar'}
       </button>
-      <button onClick={() => setOpen(false)} style={{ padding: '8px 12px' }}>
+      <button onClick={() => setOpen(false)} disabled={isPending} style={{ padding: '8px 12px' }}>
         Cancelar
       </button>
     </div>

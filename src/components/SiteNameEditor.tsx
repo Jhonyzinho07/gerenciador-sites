@@ -1,10 +1,10 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
+
 
 export function SiteNameEditor({ siteId, initialName }: { siteId: string; initialName: string }) {
-  const router = useRouter()
+
   const [name, setName] = useState(initialName)
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(initialName)
@@ -32,7 +32,7 @@ export function SiteNameEditor({ siteId, initialName }: { siteId: string; initia
         setValue(previous)
         return
       }
-      router.refresh()
+
     } catch {
       setName(previous)
       setValue(previous)

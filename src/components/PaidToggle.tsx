@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+
 
 export function PaidToggle({ siteId, initialPaid }: { siteId: string; initialPaid: boolean }) {
-  const router = useRouter()
+
   const [paid, setPaid] = useState(initialPaid)
 
   async function handleChange(checked: boolean) {
@@ -20,7 +20,7 @@ export function PaidToggle({ siteId, initialPaid }: { siteId: string; initialPai
         setPaid(previous)
         return
       }
-      router.refresh()
+
     } catch {
       setPaid(previous)
     }
