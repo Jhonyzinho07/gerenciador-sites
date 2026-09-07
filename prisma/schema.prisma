@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+enum SiteStatus {
+  NAO_INICIADO
+  EM_ANDAMENTO
+  REVISAO
+  CONCLUIDO
+  PAUSADO
+}
+
+model Site {
+  id        String          @id @default(cuid())
+  name      String
+  status    SiteStatus      @default(NAO_INICIADO)
+  priority  Int
+  checklist ChecklistItem[]
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@index([status, priority])
+}
+
+model ChecklistItem {
+  id     String  @id @default(cuid())
+  siteId String
+  site   Site    @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  label  String
+  done   Boolean @default(false)
+  order  Int
+
+  @@index([siteId, order])
+}
+
+model ChecklistTemplateItem {
+  id    String @id @default(cuid())
+  label String
+  order Int
+}
