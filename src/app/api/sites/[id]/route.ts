@@ -20,11 +20,12 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   const { id } = await params
   const body = await request.json().catch(() => null)
   const name = typeof body?.name === 'string' ? body.name.trim() : undefined
+  const paid = typeof body?.paid === 'boolean' ? body.paid : undefined
   if (name !== undefined && name.length === 0) {
     return NextResponse.json({ error: 'Nome não pode ser vazio.' }, { status: 400 })
   }
   try {
-    const site = await prisma.site.update({ where: { id }, data: { name } })
+    const site = await prisma.site.update({ where: { id }, data: { name, paid } })
     return NextResponse.json({ site })
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {

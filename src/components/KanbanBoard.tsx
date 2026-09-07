@@ -94,6 +94,23 @@ export function KanbanBoard({ initialSites }: { initialSites: BoardSite[] }) {
     }
   }
 
+  async function handleTogglePaid(id: string, paid: boolean) {
+    const previous = sites
+    setSites((prev) => prev.map((s) => (s.id === id ? { ...s, paid } : s)))
+    try {
+      const res = await fetch(`/api/sites/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paid }),
+      })
+      if (!res.ok) {
+        setSites(previous)
+      }
+    } catch {
+      setSites(previous)
+    }
+  }
+
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       {reorderError && (
@@ -104,7 +121,7 @@ export function KanbanBoard({ initialSites }: { initialSites: BoardSite[] }) {
           <Column key={col.status} status={col.status} label={col.label}>
             <SortableContext items={columnSites(col.status).map((s) => s.id)} strategy={verticalListSortingStrategy}>
               {columnSites(col.status).map((site) => (
-                <SiteCard key={site.id} site={site} />
+                <SiteCard key={site.id} site={site} onTogglePaid={handleTogglePaid} />
               ))}
             </SortableContext>
           </Column>

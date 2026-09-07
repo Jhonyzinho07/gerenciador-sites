@@ -27,6 +27,7 @@ model Site {
   name      String
   status    SiteStatus      @default(NAO_INICIADO)
   priority  Int
+  paid      Boolean         @default(false)
   checklist ChecklistItem[]
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
