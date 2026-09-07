@@ -2,14 +2,18 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useTransition } from 'react'
 
 export function AppHeader() {
   const router = useRouter()
+  const [isPending, startTransition] = useTransition()
 
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' })
-    router.push('/login')
-    router.refresh()
+    startTransition(() => {
+      router.push('/login')
+      router.refresh()
+    })
   }
 
   return (
@@ -36,6 +40,7 @@ export function AppHeader() {
         </Link>
         <button
           onClick={handleLogout}
+          disabled={isPending}
           style={{
             background: 'transparent',
             border: '1px solid rgba(255,255,255,0.6)',
@@ -43,9 +48,10 @@ export function AppHeader() {
             borderRadius: 'var(--radius-sm)',
             padding: '6px 12px',
             cursor: 'pointer',
+            opacity: isPending ? 0.7 : 1,
           }}
         >
-          Sair
+          {isPending ? 'Saindo...' : 'Sair'}
         </button>
       </nav>
     </header>

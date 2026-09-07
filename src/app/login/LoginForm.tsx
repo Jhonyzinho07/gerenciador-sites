@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 
 export function LoginForm() {
@@ -9,6 +9,7 @@ export function LoginForm() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -22,13 +23,15 @@ export function LoginForm() {
       })
       if (!res.ok) {
         setError('Email ou senha inválidos.')
+        setLoading(false)
         return
       }
-      router.push('/')
-      router.refresh()
+      startTransition(() => {
+        router.push('/')
+        router.refresh()
+      })
     } catch {
       setError('Erro de conexão. Tente novamente.')
-    } finally {
       setLoading(false)
     }
   }
@@ -41,6 +44,7 @@ export function LoginForm() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
+        disabled={loading || isPending}
         style={{ padding: 10, borderRadius: 'var(--radius-sm)', border: '1px solid var(--line)' }}
       />
       <input
@@ -49,12 +53,13 @@ export function LoginForm() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
+        disabled={loading || isPending}
         style={{ padding: 10, borderRadius: 'var(--radius-sm)', border: '1px solid var(--line)' }}
       />
       {error && <p style={{ color: '#B3261E', fontSize: 13, margin: 0 }}>{error}</p>}
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || isPending}
         style={{
           padding: 10,
           borderRadius: 'var(--radius-sm)',
@@ -63,9 +68,10 @@ export function LoginForm() {
           color: '#fff',
           fontWeight: 600,
           cursor: 'pointer',
+          opacity: (loading || isPending) ? 0.7 : 1,
         }}
       >
-        {loading ? 'Entrando…' : 'Entrar'}
+        {(loading || isPending) ? 'Entrando…' : 'Entrar'}
       </button>
     </form>
   )
