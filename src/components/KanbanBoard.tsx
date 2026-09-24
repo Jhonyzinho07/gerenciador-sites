@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import {
   DndContext,
   DragEndEvent,
@@ -94,9 +94,12 @@ export function KanbanBoard({ initialSites }: { initialSites: BoardSite[] }) {
     }
   }
 
-  async function handleTogglePaid(id: string, paid: boolean) {
-    const previous = sites
-    setSites((prev) => prev.map((s) => (s.id === id ? { ...s, paid } : s)))
+  const handleTogglePaid = useCallback(async (id: string, paid: boolean) => {
+    let previous: BoardSite[] = []
+    setSites((prev) => {
+      previous = prev
+      return prev.map((s) => (s.id === id ? { ...s, paid } : s))
+    })
     try {
       const res = await fetch(`/api/sites/${id}`, {
         method: 'PATCH',
@@ -109,7 +112,7 @@ export function KanbanBoard({ initialSites }: { initialSites: BoardSite[] }) {
     } catch {
       setSites(previous)
     }
-  }
+  }, [])
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>

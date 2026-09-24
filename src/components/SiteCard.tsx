@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import Link from 'next/link'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
@@ -12,7 +13,7 @@ export type SiteCardData = {
   paid: boolean
 }
 
-export function SiteCard({
+export const SiteCard = React.memo(function SiteCard({
   site,
   onTogglePaid,
 }: {
@@ -29,7 +30,7 @@ export function SiteCard({
       {...attributes}
       {...listeners}
       style={{
-        transform: CSS.Transform.toString(transform),
+        transform: CSS.Translate.toString(transform),
         transition,
         opacity: isDragging ? 0.5 : 1,
         background: site.paid ? '#E6F4EA' : 'var(--paper)',
@@ -40,7 +41,7 @@ export function SiteCard({
         cursor: 'grab',
       }}
     >
-      <Link href={`/sites/${site.id}`} style={{ textDecoration: 'none', color: 'var(--text)' }}>
+      <Link href={`/sites/${site.id}`} prefetch={true} style={{ textDecoration: 'none', color: 'var(--text)' }}>
         <strong style={{ display: 'block', marginBottom: 4 }}>{site.name}</strong>
         <span style={{ fontSize: 13, color: 'var(--text-2)' }}>
           {site.doneCount}/{site.totalCount}
@@ -68,4 +69,4 @@ export function SiteCard({
       </label>
     </div>
   )
-}
+})
