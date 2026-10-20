@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Site" DROP COLUMN "paid",
+ADD COLUMN     "paidAmount" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "totalAmount" INTEGER NOT NULL DEFAULT 0;
