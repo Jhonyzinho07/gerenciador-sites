@@ -15,7 +15,8 @@ export default async function DashboardPage() {
     name: s.name,
     status: s.status,
     priority: s.priority,
-    paid: s.paid,
+    totalAmount: s.totalAmount,
+    paidAmount: s.paidAmount,
     doneCount: s.checklist.filter((c) => c.done).length,
     totalCount: s.checklist.length,
   }))

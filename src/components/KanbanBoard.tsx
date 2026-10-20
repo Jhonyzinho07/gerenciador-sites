@@ -94,17 +94,17 @@ export function KanbanBoard({ initialSites }: { initialSites: BoardSite[] }) {
     }
   }
 
-  const handleTogglePaid = useCallback(async (id: string, paid: boolean) => {
+  const handleUpdatePayment = useCallback(async (id: string, totalAmount: number, paidAmount: number) => {
     let previous: BoardSite[] = []
     setSites((prev) => {
       previous = prev
-      return prev.map((s) => (s.id === id ? { ...s, paid } : s))
+      return prev.map((s) => (s.id === id ? { ...s, totalAmount, paidAmount } : s))
     })
     try {
       const res = await fetch(`/api/sites/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paid }),
+        body: JSON.stringify({ totalAmount, paidAmount }),
       })
       if (!res.ok) {
         setSites(previous)
@@ -124,7 +124,7 @@ export function KanbanBoard({ initialSites }: { initialSites: BoardSite[] }) {
           <Column key={col.status} status={col.status} label={col.label}>
             <SortableContext items={columnSites(col.status).map((s) => s.id)} strategy={verticalListSortingStrategy}>
               {columnSites(col.status).map((site) => (
-                <SiteCard key={site.id} site={site} onTogglePaid={handleTogglePaid} />
+                <SiteCard key={site.id} site={site} onUpdatePayment={handleUpdatePayment} />
               ))}
             </SortableContext>
           </Column>
